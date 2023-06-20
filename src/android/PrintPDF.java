@@ -208,6 +208,9 @@ public class PrintPDF extends CordovaPlugin {
             public void run() {
 
                 PrintManager printManager = (PrintManager) cordova.getActivity().getSystemService(Context.PRINT_SERVICE);
+                PrintAttributes landscapeMode = new PrintAttributes.Builder()
+                    .setMediaSize(PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE)
+                    .build();
 
                 PrintDocumentAdapter pda = new PrintDocumentAdapter() {
 
@@ -255,7 +258,7 @@ public class PrintPDF extends CordovaPlugin {
                     }
                 };
 
-                printManager.print(title, pda, null);
+                printManager.print(title, pda, landscapeMode);
 
             }
         });

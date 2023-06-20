@@ -70,6 +70,7 @@ NSString * const KEY_TYPE_DATA = @"Data";
         //Set the printer settings
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
+        printInfo.orientation = UIPrintInfo.Orientation.landscape;
         printInteraction.printInfo = printInfo;
         printInteraction.showsPageRange = YES;
         printInteraction.printingItem = pdfData;

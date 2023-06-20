@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-print-pdf",
-  "version": "4.0.2",
-  "description": "Cordova Print PDF Plugin",
+  "name": "@daan-banaan/cordova-plugin-print-pdf-landscape",
+  "version": "1.0",
+  "description": "Cordova Print PDF Plugin in landscape mode",
   "cordova": {
-    "id": "cordova-plugin-print-pdf",
+    "id": "cordova-plugin-print-pdf-landscape",
     "platforms": [
       "ios",
       "android"
@@ -11,15 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sarahgoldman/cordova-print-pdf-plugin"
+    "url": "https://github.com/DaanPepping/cordova-print-pdf-plugin-landscape"
   },
   "keywords": [
     "cordova",
     "print",
     "cordova-ios",
     "cordova-android",
-    "pdf"
+    "pdf",
+    "landscape"
   ],
-  "author": "Sarah Goldman",
+  "author": "Sarah Goldman - Daan Pepping",
   "license": "MIT"
 }
