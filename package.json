@@ -1,6 +1,6 @@
 {
   "name": "@daan-banaan/cordova-plugin-print-pdf-landscape",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Cordova Print PDF Plugin in landscape mode",
   "cordova": {
     "id": "cordova-plugin-print-pdf-landscape",
