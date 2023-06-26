@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
+import android.os.FileObserver;
 import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
@@ -32,7 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.OutputStream;    
+import java.net.URI;
 
 /**
  * This plug in brings up a native overlay to print pdf documents.
@@ -43,11 +45,14 @@ public class PrintPDF extends CordovaPlugin {
 
     public static final String ACTION_PRINT_DOCUMENT = "printDocument";
     public static final String ACTION_IS_PRINT_AVAILABLE = "isPrintingAvailable";
+    private static final String ACTION_SAVE_PDF = "save";
     private static final String DEFAULT_DOC_NAME = "unknown";
     private static final String DEFAULT_DOC_TYPE = "Data";
     private static final String FILE_DOC_TYPE = "File";
-
-    private String filePathString;
+    private static final String type = "application/pdf";
+    
+    private String filePathString;    
+    private InputStream saveInput;
 
     /**
      * Executes the request.
@@ -87,9 +92,29 @@ public class PrintPDF extends CordovaPlugin {
                 printViaNative(content, type, title);
             }
                return true;
+
         } else if (action.equals(ACTION_IS_PRINT_AVAILABLE)) {
             isAvailable();
                return true;
+
+        } else if(action.equals(ACTION_SAVE_PDF)) {
+            final String content = args.optString(0, "");
+            final String title = args.optString(1, DEFAULT_DOC_NAME);
+            try {
+                saveInput = convertContentToInputStream(content, type);
+            } catch (FileNotFoundException e) {
+                handlePrintError(e);
+            }
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType(type); 
+            intent.putExtra(Intent.EXTRA_TITLE, title);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|
+                Intent.FLAG_ACTIVITY_NO_HISTORY);
+            cordova.startActivityForResult(null, intent, 69420);
+            cordova.setActivityResultCallback(this);
+            return true;
         }
         return false;
 
@@ -161,7 +186,7 @@ public class PrintPDF extends CordovaPlugin {
         return input;
     }
 
-    private void writeInputStreamToOutput (InputStream input, FileOutputStream output) throws IOException {
+    private void writeInputStreamToOutput (InputStream input, OutputStream output) throws IOException {
         byte[] buf = new byte[1024];
         int bytesRead;
 
@@ -208,8 +233,8 @@ public class PrintPDF extends CordovaPlugin {
             public void run() {
 
                 PrintManager printManager = (PrintManager) cordova.getActivity().getSystemService(Context.PRINT_SERVICE);
-                PrintAttributes landscapeMode = new PrintAttributes.Builder()
-                    .setMediaSize(PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE)
+                PrintAttributes landscapeMode = new PrintAttributes.Builder()                 
+                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4.asLandscape())
                     .build();
 
                 PrintDocumentAdapter pda = new PrintDocumentAdapter() {
@@ -329,12 +354,41 @@ public class PrintPDF extends CordovaPlugin {
      */
     @Override
     public void onActivityResult(int reqCode, int resCode, Intent intent) {
-        super.onActivityResult(reqCode, resCode, intent);
-        File file = new File(filePathString);
-        if (file.exists()) {
-            boolean deleted = file.delete();
+        // save request completed
+        if(reqCode == 69420 && resCode == Activity.RESULT_OK) {
+            Uri uri = intent.getData();
+
+            //after creating the pdf file, we write the content.
+            try {
+                OutputStream output = cordova.getContext().getContentResolver().openOutputStream(uri);
+                writeInputStreamToOutput(saveInput, output);           
+                
+            }
+            catch(IOException e) {
+                handlePrintError(e);
+            }
+             //after writing to the file, we refresh the file system            
+            cordova.getContext().getContentResolver().notifyChange(uri, null);
+                 //then we open the file
+                Intent openPdf = new Intent(Intent.ACTION_VIEW);
+                openPdf.setData(uri);
+                openPdf.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|
+                    Intent.FLAG_ACTIVITY_NO_HISTORY);
+                cordova.startActivityForResult(null, openPdf, 42069); 
+      
+           
+
+           
+
+        } else {
+            // air print request completed
+            super.onActivityResult(reqCode, resCode, intent);
+            File file = new File(filePathString);
+            if (file.exists()) {
+               boolean deleted = file.delete();
+            }
+            handlePrintSuccess();
         }
-        handlePrintSuccess();
     }
 
 
