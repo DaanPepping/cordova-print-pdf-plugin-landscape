@@ -1,6 +1,6 @@
 {
   "name": "@daan-banaan/cordova-plugin-print-pdf-landscape",
-  "version": "1.1.0",
+  "version": "1.1.3",
   "description": "Cordova Print PDF Plugin in landscape mode, also provides save functionality for android",
   "cordova": {
     "id": "cordova-plugin-print-pdf-landscape",

@@ -113,13 +113,14 @@ PrintPDF.prototype.save = function (options) {
 
   // make the call
   if (device.platform === "Android") {
-  cordova.exec(
-    successCallback,
-    errorCallback,
-    this.CLASS,
-    this.SAVE_METHOD,
-    args
-  );
+    cordova.exec(
+      successCallback,
+      errorCallback,
+      this.CLASS,
+      this.SAVE_METHOD,
+      args
+    );
+  }
 };
 
 PrintPDF.prototype.defaultCallback = null;
