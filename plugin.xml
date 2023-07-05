@@ -2,8 +2,8 @@
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	id="cordova-plugin-print-pdf-landscape"
-	version="1.1.4">
+	id="@daan-banaan/cordova-plugin-print-pdf-landscape"
+	version="1.1.5">
 	<name>PrintPDF</name>
 	<description>Cordova Print PDF Plugin Landscape</description>
 	<license>MIT</license>
